@@ -1,8 +1,13 @@
 <template>
   <div class="app">
     <nav class="nav">
-      <router-link to="/" class="nav-link">Ana Sayfa</router-link>
-      <router-link to="/login" class="nav-link">Giriş Yap</router-link>
+      <template v-if="isAuthenticated">
+        <router-link to="/" class="nav-link">Ana Sayfa</router-link>
+        <a href="#" @click.prevent="handleLogout" class="nav-link">Çıkış Yap</a>
+      </template>
+      <template v-else>
+        <router-link to="/login" class="nav-link">Giriş Yap</router-link>
+      </template>
     </nav>
     
     <main>
@@ -12,7 +17,19 @@
 </template>
 
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+
+const store = useStore()
+const router = useRouter()
+
+const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
+
+const handleLogout = () => {
+  store.dispatch('auth/logout')
+  router.push('/login')
+}
 </script>
 
 <style>
