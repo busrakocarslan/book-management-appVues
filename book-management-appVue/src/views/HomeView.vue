@@ -11,8 +11,8 @@
           class="search-input"
         />
       </div>
-      <button class="add-button" @click="handleAddBook">
-        Yeni Kitap Ekle
+      <button class="add-button" @click="navigateToAddBook">
+        + Yeni Kitap Ekle
       </button>
       
     </div>
@@ -54,6 +54,10 @@ const searchQuery = ref('')
 const books = computed(() => store.getters['books/getAllBooks'])
 const loading = computed(() => store.state.books.loading)
 const error = computed(() => store.state.books.error)
+
+const navigateToAddBook = () => {
+  router.push('/add-book')
+}
 
 const handleSearch = debounce(async (event) => {
   const query = event.target.value

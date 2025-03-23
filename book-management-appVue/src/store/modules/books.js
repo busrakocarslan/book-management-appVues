@@ -42,6 +42,21 @@ export default {
       } finally {
         commit('SET_LOADING', false)
       }
+    },
+    async addBook({ commit, state }, bookData) {
+      commit('SET_LOADING', true)
+      try {
+        // LocalStorage'a kaydet
+        const books = [...state.books, bookData]
+        commit('SET_BOOKS', books)
+        return bookData
+      } catch (error) {
+        commit('SET_ERROR', error.message)
+        throw error
+      } finally {
+        commit('SET_LOADING', false)
+      }
     }
+
   }
 }
