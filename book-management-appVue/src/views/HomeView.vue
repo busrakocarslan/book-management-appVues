@@ -2,6 +2,7 @@
   <div class="home">
     <div class="header">
       <h1>Kitap Listesi</h1>
+      <div class="left-section">
       <div class="search-container">
         <input 
           type="text" 
@@ -11,9 +12,19 @@
           class="search-input"
         />
       </div>
-      <button class="add-button" @click="navigateToAddBook">
-        + Yeni Kitap Ekle
-      </button>
+    </div>
+
+        <div class="right-section">
+        <button class="add-button" @click="navigateToAddBook">
+          + Yeni Kitap Ekle
+        </button>
+        <div class="user-profile" @click="navigateToProfile">
+          <div class="user-avatar">
+            {{ userInitials }}
+          </div>
+          <span class="user-name">{{ currentUser?.name }}</span>
+        </div>
+      </div>
       
     </div>
 
@@ -73,6 +84,26 @@ const viewDetails = (isbn13) => {
 onMounted(async () => {
   await store.dispatch('books/searchBooks')
 })
+
+//user-profil alanı için 
+const currentUser = computed(() => store.getters['auth/currentUser'])
+const userInitials = computed(() => {
+  if (!currentUser.value?.name) return ''
+  return currentUser.value.name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+})
+
+const navigateToProfile = () => {
+  router.push('/profile')
+}
+
+
+
+
+
 </script>
 
 <style scoped>
@@ -85,6 +116,49 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+}
+
+.left-section {
+  display: flex;
+  align-items: center;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.user-profile:hover {
+  background-color: #f8f9fa;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  background-color: #42b883;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.user-name {
+  color: #2c3e50;
+  font-weight: 500;
 }
 
 .add-button {

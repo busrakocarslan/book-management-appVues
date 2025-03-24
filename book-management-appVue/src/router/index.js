@@ -5,6 +5,7 @@ import BookDetailView from '../views/books/BookDetailView.vue'
 import AddBookView from '../views/books/AddBookView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
 import ForgotPasswordView from '../views/auth/ForgotPassword.vue'
+import ProfileView from '../views/ProfileView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,7 +14,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true }// sadece giriş yapmış kullanıcıların görebilmesi için ekledim.
     },
     {
       path: '/login',
@@ -31,6 +32,12 @@ const router = createRouter({
       name: 'forgot-password',
       component: ForgotPasswordView,
       meta: { requiresGuest: true }
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: ProfileView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/book/:isbn13',
