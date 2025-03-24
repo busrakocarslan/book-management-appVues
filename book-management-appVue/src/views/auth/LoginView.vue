@@ -1,5 +1,6 @@
 <template>
     <div class="login-container">
+      <BlurBackground />
       <form @submit.prevent="handleLogin" class="login-form">
         <h2>Giriş Yap</h2>
         <div class="form-group">
@@ -43,6 +44,7 @@
   import { ref } from 'vue'
   import { useStore } from 'vuex'
   import { useRouter } from 'vue-router'
+  import BlurBackground from '@/components/Background/BlurBackground.vue'
   
   const store = useStore()
   const router = useRouter()
@@ -82,11 +84,11 @@
   
   .login-form {
     background: white;
-    padding: 2rem;
+    padding: 3rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
   }
   
   h2 {

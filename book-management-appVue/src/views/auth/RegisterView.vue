@@ -1,5 +1,6 @@
 <template>
   <div class="register-container">
+    <BlurBackground />
     <form @submit.prevent="handleRegister" class="register-form">
       <h2>Kayıt Ol</h2>
       
@@ -53,6 +54,7 @@
 import { reactive, computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import BlurBackground from '@/components/Background/BlurBackground.vue'
 
 const store = useStore()
 const router = useRouter()
@@ -83,12 +85,11 @@ const handleRegister = async () => {
   align-items: center;
   min-height: 100vh;
   padding: 2rem;
-  background-color: #f8f9fa;
 }
 
 .register-form {
   background: white;
-  padding: 2rem;
+  padding: 4rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   width: 100%;

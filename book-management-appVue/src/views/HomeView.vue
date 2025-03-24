@@ -19,10 +19,8 @@
           + Yeni Kitap Ekle
         </button>
         <div class="user-profile" @click="navigateToProfile">
-          <div class="user-avatar">
-            {{ userInitials }}
-          </div>
-          <span class="user-name">{{ currentUser?.name }}</span>
+          
+          <span class="user-name">{{ currentUser?.name }} Profil</span>
         </div>
       </div>
       
@@ -132,33 +130,34 @@ const navigateToProfile = () => {
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  padding: 0.6rem 1.2rem;
+  border: 2px solid;
+  border-radius: 50px;
+  background: linear-gradient(90deg, #eef0eb, #d9b4ec, #eaece9);
+  background-size: 200% 100%;
+  animation: gradientMove 15s linear infinite;
 }
 
-.user-profile:hover {
-  background-color: #f8f9fa;
+
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
 }
 
-.user-avatar {
-  width: 32px;
-  height: 32px;
-  background-color: #42b883;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 0.9rem;
-}
+
 
 .user-name {
-  color: #2c3e50;
-  font-weight: 500;
+  color: #52745d;
+  font-weight: 600;
+  font-size: 1rem;
+  text-transform: capitalize;
 }
 
 .add-button {

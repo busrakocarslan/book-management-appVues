@@ -1,5 +1,6 @@
 <template>
     <div class="forgot-password-container">
+      <BlurBackground />
       <form @submit.prevent="handleForgotPassword" class="forgot-password-form">
         <h2>Şifre Sıfırlama</h2>
         <p class="form-description">
@@ -34,7 +35,8 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue'
+  import BlurBackground from '@/components/Background/BlurBackground.vue'
+import { ref } from 'vue'
   import { useStore } from 'vuex'
   
   const store = useStore()

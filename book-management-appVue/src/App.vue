@@ -11,6 +11,7 @@
     </nav>
     
     <main>
+      <BackgroundLines v-if="showBackground" />
       <router-view></router-view>
     </main>
   </div>
@@ -20,9 +21,15 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import BackgroundLines from './components/Background/BackgroundLines.vue'
 
 const store = useStore()
 const router = useRouter()
+
+const showBackground = computed(() => {
+  const route = router.currentRoute.value.name
+  return !['login', 'register','forgot-password'].includes(route)
+})
 
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 
