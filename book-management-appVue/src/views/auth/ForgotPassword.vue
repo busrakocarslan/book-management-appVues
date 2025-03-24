@@ -1,7 +1,11 @@
 <template>
-    <div class="login-container">
-      <form @submit.prevent="handleLogin" class="login-form">
-        <h2>Giriş Yap</h2>
+    <div class="forgot-password-container">
+      <form @submit.prevent="handleForgotPassword" class="forgot-password-form">
+        <h2>Şifre Sıfırlama</h2>
+        <p class="form-description">
+          Email adresinizi girin, size şifre sıfırlama bağlantısı gönderelim.
+        </p>
+        
         <div class="form-group">
           <label for="email">Email</label>
           <input 
@@ -12,29 +16,19 @@
             placeholder="Email adresiniz"
           />
         </div>
-        <div class="form-group">
-          <label for="password">Şifre</label>
-          <input 
-            type="password" 
-            id="password" 
-            v-model="password" 
-            required 
-            placeholder="Şifreniz"
-          />
-          <router-link to="/forgot-password" class="forgot-password-link">
-          Şifremi Unuttum
-        </router-link>
-        </div>
+  
         <button type="submit" :disabled="loading">
-          {{ loading ? 'Giriş yapılıyor...' : 'Giriş Yap' }}
+          {{ loading ? 'Gönderiliyor...' : 'Sıfırlama Bağlantısı Gönder' }}
         </button>
+  
         <p v-if="error" class="error-message">{{ error }}</p>
+        <p v-if="success" class="success-message">{{ success }}</p>
+  
         <div class="auth-links">
-        <p class="register-link">
-          Hesabınız yok mu? 
-          <router-link to="/register">Kayıt Ol</router-link>
-        </p>
-      </div>
+          <router-link to="/login" class="back-to-login">
+            ← Giriş sayfasına dön
+          </router-link>
+        </div>
       </form>
     </div>
   </template>
@@ -42,29 +36,23 @@
   <script setup>
   import { ref } from 'vue'
   import { useStore } from 'vuex'
-  import { useRouter } from 'vue-router'
   
   const store = useStore()
-  const router = useRouter()
-  
   const email = ref('')
-  const password = ref('')
   const loading = ref(false)
   const error = ref('')
+  const success = ref('')
   
-  const handleLogin = async () => {
+  const handleForgotPassword = async () => {
     try {
       loading.value = true
       error.value = ''
+      success.value = ''
       
-      await store.dispatch('auth/login', {
-        email: email.value,
-        password: password.value
-      })
-      
-      router.push('/')
+      const result = await store.dispatch('auth/forgotPassword', email.value)
+      success.value = result.message
     } catch (err) {
-      error.value = 'Giriş başarısız oldu.'
+      error.value = 'Şifre sıfırlama işlemi başarısız oldu.'
     } finally {
       loading.value = false
     }
@@ -72,7 +60,7 @@
   </script>
   
   <style scoped>
-  .login-container {
+  .forgot-password-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -80,7 +68,7 @@
     padding: 20px;
   }
   
-  .login-form {
+  .forgot-password-form {
     background: white;
     padding: 2rem;
     border-radius: 8px;
@@ -89,10 +77,10 @@
     max-width: 400px;
   }
   
-  h2 {
+  .form-description {
+    color: #666;
+    margin-bottom: 1.5rem;
     text-align: center;
-    color: #42b883;
-    margin-bottom: 2rem;
   }
   
   .form-group {
@@ -144,35 +132,25 @@
     text-align: center;
     margin-top: 1rem;
   }
-  .auth-links {
-  margin-top: 1.5rem;
-  text-align: center;
-}
-
-.register-link {
-  color: #666;
-}
-
-.register-link a {
-  color: #42b883;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.register-link a:hover {
-  text-decoration: underline;
-}
-
-.forgot-password-link {
-  display: block;
-  text-align: right;
-  font-size: 0.9rem;
-  color: #666;
-  margin-top: 0.5rem;
-  text-decoration: none;
-}
-
-.forgot-password-link:hover {
-  color: #42b883;
-}
+    
+  .success-message {
+    color: #42b883;
+    text-align: center;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: #ebf9f3;
+    border-radius: 4px;
+  }
+  
+  .back-to-login {
+    display: block;
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #666;
+    text-decoration: none;
+  }
+  
+  .back-to-login:hover {
+    color: #42b883;
+  }
   </style>

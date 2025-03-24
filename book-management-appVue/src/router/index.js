@@ -3,6 +3,8 @@ import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/auth/LoginView.vue'
 import BookDetailView from '../views/books/BookDetailView.vue'
 import AddBookView from '../views/books/AddBookView.vue'
+import RegisterView from '../views/auth/RegisterView.vue'
+import ForgotPasswordView from '../views/auth/ForgotPassword.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,6 +21,18 @@ const router = createRouter({
       component: LoginView
     },
     {
+      path: '/register',
+      name: 'register',
+      component: RegisterView,
+      meta: { requiresGuest: true }
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: ForgotPasswordView,
+      meta: { requiresGuest: true }
+    },
+    {
       path: '/book/:isbn13',
       name: 'book-detail',
       component: BookDetailView,
@@ -30,6 +44,7 @@ const router = createRouter({
       component:AddBookView,
       meta: { requiresAuth: true }
     }
+
   ]
 })
 
