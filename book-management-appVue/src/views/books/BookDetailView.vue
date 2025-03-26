@@ -3,45 +3,29 @@
       <div class="container">
         <div class="book-header">
           <button class="back-button" @click="router.back()">← Geri</button>
+          
           <h1>{{ book.title }}</h1>
         </div>
   
         <div class="book-content">
           <div class="book-image-container">
-            <img :src="book.image" :alt="book.title" class="book-image">
-            <div class="price-tag">{{ book.price }}</div>
+            <button 
+            class="favorite-button" 
+            @click="toggleFavorite"
+            :class="{ active: isFavorite }"
+          >
+            <i class="fas" :class="isFavorite ? 'fa-heart' : 'fa-heart-o'"></i>
+          </button>
+            <img :src="book.image" :alt="book.title" class="book-image">            
+            <div class="price-tag">{{ book.price }}              
+            </div>
+
           </div>
   
-          <div class="book-info">
-            <h2>{{ book.subtitle }}</h2>
-            <div class="info-grid">
-              <div class="info-item">
-                <strong>ISBN13:</strong>
-                <span>{{ book.isbn13 }}</span>
-              </div>
-              <div class="info-item">
-                <strong>Yazarlar:</strong>
-                <span>{{ book.authors }}</span>
-              </div>
-              <div class="info-item">
-                <strong>Yayın:</strong>
-                <span>{{ book.publisher }}</span>
-              </div>
-              <div class="info-item">
-                <strong>Yıl:</strong>
-                <span>{{ book.year }}</span>
-              </div>
-            </div>
-  
-            <div class="description">
-              <h3>Açıklama</h3>
-              <p>{{ book.desc }}</p>
-            </div>
-  
-            <a :href="book.url" target="_blank" class="buy-button">
-              Satın Al
-            </a>
-          </div>
+          <BookMetaInfo :book="book" />
+    <BookReviews :bookId="book.isbn13" :currentUserId="currentUserId" />
+    <RelatedBooks :category="book.category" :currentBookId="book.isbn13" />
+    <SocialShare :title="book.title" :url="currentUrl" />
         </div>
       </div>
     </div>
@@ -57,11 +41,26 @@
   import { ref, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { bookService } from '@/services/bookService'
-  
+  import BookMetaInfo from '@/components/BookDetail/BookMetaInfo.vue'
+  import BookReviews from '@/components/BookDetail/BookReviews.vue'
+  import RelatedBooks from '@/components/BookDetail/RelatedBooks.vue'
+  import SocialShare from '@/components/BookDetail/SocialShare.vue'
+
   const route = useRoute()
   const router = useRouter()
   const book = ref(null)
   const loading = ref(true)
+
+  const toggleFavorite = () => {
+  store.dispatch('books/toggleFavorite', book.value)
+}
+
+
+
+
+
+
+
   
   onMounted(async () => {
     try {
@@ -84,6 +83,31 @@
     max-width: 1200px;
     margin: 0 auto;
   }
+  .favorite-button {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.favorite-button.active {
+  background: #ff4757;
+  color: white;
+}
+.favorite-button:hover {
+  transform: scale(1.1);
+}
   
   .book-header {
     display: flex;

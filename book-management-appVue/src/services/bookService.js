@@ -32,5 +32,22 @@ export const bookService = {
       console.error('Error fetching book detail:', error)
       throw error
     }
+  },
+
+  async getRelatedBooks(category) {
+    try {
+     
+      const searchTerm = category || 'programming' 
+      const response = await axios.get(`${BASE_URL}/search/${searchTerm}`)
+      
+      if (response.data && response.data.books) {
+        console.log('Related books found:', response.data.books.length)
+        return response.data.books
+      }
+      return []
+    } catch (error) {
+      console.error('Error fetching related books:', error)
+      return []
+    }
   }
 }
