@@ -53,7 +53,7 @@
       const books = await bookService.getRelatedBooks(props.category)
       // Mevcut kitabı listeden çıkar
       relatedBooks.value = books.filter(book => book.isbn13 !== props.currentBookId)
-                               .slice(0, 4) // Sadece 4 benzer kitap göster
+                               .slice(0, 3)
     } catch (error) {
       console.error('Error fetching related books:', error)
     }

@@ -27,6 +27,7 @@ export const bookService = {
   async getBookDetail(isbn13) {
     try {
       const response = await axios.get(`${BASE_URL}/books/${isbn13}`)
+      console.log('Book detail:', response.data)
       return response.data
     } catch (error) {
       console.error('Error fetching book detail:', error)

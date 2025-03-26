@@ -3,23 +3,50 @@
       <h3>Kitap İncelemeleri</h3>
       
       <!-- Yorum Yazma Formu -->
-      <div class="review-form" v-if="!editingReview">
-        <div class="star-rating">
-          <i v-for="n in 5" 
-             :key="n"
-             class="fas fa-star"
-             :class="{ active: n <= rating }"
-             @click="rating = n"
-          ></i>
-        </div>
-        <textarea 
-          v-model="reviewText"
-          placeholder="Bu kitap hakkında düşüncelerinizi yazın..."
-        ></textarea>
-        <button @click="submitReview" :disabled="!canSubmit">
+      <div class="reviews-section">
+    <h3>Kitap İncelemeleri</h3>
+    
+    <!-- Yorum Yazma/Düzenleme Formu -->
+    <div class="review-form">
+      <div class="star-rating">
+        <i v-for="n in 5" 
+           :key="n"
+           class="fas fa-star"
+           :class="{ active: n <= rating }"
+           @click="rating = n"
+        ></i>
+      </div>
+      <textarea 
+        v-model="reviewText"
+        placeholder="Bu kitap hakkında düşüncelerinizi yazın..."
+      ></textarea>
+      <div class="form-buttons">
+        <button 
+          v-if="editingReview"
+          @click="updateReview" 
+          :disabled="!canSubmit"
+          class="submit-btn"
+        >
+          Yorumu Güncelle
+        </button>
+        <button 
+          v-if="editingReview"
+          @click="cancelEdit" 
+          class="cancel-btn"
+        >
+          İptal
+        </button>
+        <button 
+          v-else
+          @click="submitReview" 
+          :disabled="!canSubmit"
+          class="submit-btn"
+        >
           Yorum Gönder
         </button>
       </div>
+    </div>
+
   
       <!-- Yorumlar Listesi -->
       <div class="reviews-list">
@@ -39,7 +66,6 @@
           </div>
           <p class="review-text">{{ review.text }}</p>
           
-          <!-- Kullanıcının kendi yorumları için düzenleme/silme -->
           <div v-if="review.userId === currentUserId" class="review-actions">
             <button @click="editReview(review)" class="edit-btn">
               <i class="fas fa-edit"></i>
@@ -50,6 +76,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
   </template>
   
@@ -102,12 +129,41 @@
       console.error('Error submitting review:', error)
     }
   }
+
+  
   
   const editReview = (review) => {
     editingReview.value = review
     rating.value = review.rating
     reviewText.value = review.text
   }
+  const updateReview = async () => {
+  if (!canSubmit.value || !editingReview.value) return
+
+  const updatedReview = {
+    ...editingReview.value,
+    rating: rating.value,
+    text: reviewText.value,
+    updatedAt: new Date()
+  }
+
+  try {
+    await store.dispatch('books/updateReview', updatedReview)
+    const index = reviews.value.findIndex(r => r.id === updatedReview.id)
+    if (index !== -1) {
+      reviews.value[index] = updatedReview
+    }
+    cancelEdit()
+  } catch (error) {
+    console.error('Error updating review:', error)
+  }
+}
+
+const cancelEdit = () => {
+  editingReview.value = null
+  rating.value = 0
+  reviewText.value = ''
+}
   
   const deleteReview = async (reviewId) => {
     if (!confirm('Bu yorumu silmek istediğinizden emin misiniz?')) return
@@ -192,4 +248,31 @@
     background: #ff4757;
     color: white;
   }
+  .form-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.cancel-btn {
+  background: #666;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-btn {
+  background: #42b883;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
   </style>
