@@ -31,6 +31,35 @@
           </button>
         </div>
       </div>
+
+      <div class="favorites-section">
+      <h2>Favori Kitaplarım</h2>
+      <div class="favorites-grid">
+        <div v-for="book in favoriteBooks" :key="book.isbn13" class="book-card">
+          <img :src="book.image" :alt="book.title" class="book-image">
+          <div class="book-info">
+            <h3>{{ book.title }}</h3>
+            <p class="book-price">{{ formatPrice(book.price) }}</p>
+            <div class="book-actions">
+              <button @click="removeFromFavorites(book)" class="remove-favorite">
+                <i class="fas fa-heart-broken"></i> Favorilerden Çıkar
+              </button>
+              <button @click="viewDetails(book.isbn13)" class="view-details">
+                <i class="fas fa-info-circle"></i> Detaylar
+              </button>
+            </div>
+          </div>
+        </div>
+        <div v-if="favoriteBooks.length === 0" class="no-favorites">
+          Henüz favori kitabınız bulunmuyor.
+        </div>
+      </div>
+      </div>
+
+
+
+
+
     </div>
   </template>
   
@@ -65,6 +94,30 @@
     await store.dispatch('auth/logout')
     router.push('/login')
   }
+
+
+  const favoriteBooks = computed(() => store.state.books.favorites)
+
+// Kitap detayına git
+const viewDetails = (isbn13) => {
+  router.push({ name: 'book-detail', params: { isbn13 } })
+}
+
+// Favorilerden çıkar
+const removeFromFavorites = (book) => {
+  store.dispatch('books/toggleFavorite', book)
+}
+
+// Fiyat formatla
+const formatPrice = (price) => {
+  if (!price) return 'Ücretsiz'
+  return new Intl.NumberFormat('tr-TR', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(parseFloat(price.replace(/[^0-9.-]+/g, '')))
+}
+
+
   </script>
   
   <style scoped>
@@ -138,4 +191,111 @@
   .logout-button:hover {
     background-color: #c82333;
   }
+
+  .favorites-section {
+  margin-top: 2rem;
+}
+
+.favorites-section h2 {
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+  .book-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.book-image {
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+  background: #f8f9fa;
+}
+
+.book-info {
+  padding: 1rem;
+}
+
+.book-info h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
+
+
+  .book-price {
+  color: #42b883;
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+.book-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.remove-favorite,
+.view-details {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+  .remove-favorite {
+  background-color: #dc3545;
+  color: white;
+  flex: 1;
+}
+
+.remove-favorite:hover {
+  background-color: #c82333;
+}
+
+.view-details {
+  background-color: #42b883;
+  color: white;
+  flex: 1;
+}
+
+.view-details:hover {
+  background-color: #3aa876;
+}
+
+.no-favorites {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  color: #666;
+}
   </style>
