@@ -56,6 +56,33 @@
       </div>
       </div>
 
+      <div class="user-books-section">
+      <h2>Eklediğim Kitaplar</h2>
+      <div class="books-grid">
+        <div v-for="book in userBooks" 
+             :key="book.isbn13" 
+             class="book-card">
+          <img :src="book.image" :alt="book.title" class="book-image">
+          <div class="book-info">
+            <h3>{{ book.title }}</h3>
+            <p class="book-author">{{ book.authors }}</p>
+            <p class="book-price">{{ formatPrice(book.price) }}</p>
+            <p class="book-date">Eklenme: {{ formatDate(book.addedAt) }}</p>
+            <div class="book-actions">
+              <button @click="viewDetails(book.isbn13)" class="view-details">
+                <i class="fas fa-info-circle"></i> Detaylar
+              </button>
+            </div>
+          </div>
+        </div>
+        <div v-if="userBooks.length === 0" class="no-books">
+          Henüz kitap eklememişsiniz.
+        </div>
+      </div>
+    </div>
+
+
+
 
 
 
@@ -64,7 +91,7 @@
   </template>
   
   <script setup>
-  import { computed } from 'vue'
+  import { computed,onMounted } from 'vue'
   import { useStore } from 'vuex'
   import { useRouter } from 'vue-router'
   
@@ -98,6 +125,8 @@
 
   const favoriteBooks = computed(() => store.state.books.favorites)
 
+  const userBooks = computed(() => store.getters['books/getUserBooks'])
+
 // Kitap detayına git
 const viewDetails = (isbn13) => {
   router.push({ name: 'book-detail', params: { isbn13 } })
@@ -116,6 +145,16 @@ const formatPrice = (price) => {
     currency: 'USD'
   }).format(parseFloat(price.replace(/[^0-9.-]+/g, '')))
 }
+
+onMounted(async () => {
+  try {
+    await store.dispatch('books/loadUserBooks')
+  } catch (error) {
+    console.error('Kitaplar yüklenirken hata:', error)
+  }
+})
+
+
 
 
   </script>
@@ -201,11 +240,13 @@ const formatPrice = (price) => {
   color: #2c3e50;
 }
 
-.favorites-grid {
+.favorites-grid,
+.books-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1.5rem;
   margin-top: 1rem;
+
 }
   .book-card {
   background: white;
@@ -213,6 +254,7 @@ const formatPrice = (price) => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.3s ease;
+
 }
 
 .book-card:hover {
@@ -292,6 +334,28 @@ const formatPrice = (price) => {
 
 .no-favorites {
   grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  color: #666;
+}
+
+.user-books-section {  
+  margin-top: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+
+}
+.book-date {
+  color: #666;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.no-books {
   text-align: center;
   padding: 2rem;
   background: #f8f9fa;

@@ -4,6 +4,12 @@
     <div class="header">
       <div class="left-section">
         <h1>Kitap Listesi</h1>
+        <button 
+      @click="router.push('/add-book')" 
+      class="add-book-btn"
+    >
+      <i class="fas fa-plus"></i>Kitap Ekle
+    </button>
         <div class="view-controls">
           <button 
             :class="['view-btn', { active: viewMode === 'grid' }]"
@@ -236,12 +242,10 @@ const filteredBooks = computed(() => {
   let result = [...books.value]
 
   // Filtreler
-  //kategori
     // Kategori filtresi
     if (filters.value.categories.length > 0) {
     console.log('Applying category filter:', filters.value.categories)
     result = result.filter(book => {
-      // Kategori API'den gelmediyse ya da net değilse kontrolü
       if (!book.category) return false
       return filters.value.categories.includes(book.category)
     })
@@ -383,22 +387,33 @@ const formatPrice = (price) => {
   }).format(finalAmount)
 }
 
+const viewDetails = async (isbn13) => {
+  try {
+    await router.push({
+      name: 'book-detail',
+      params: { isbn13: isbn13.toString() }
+    })
+  } catch (error) {
+    console.error('Kitap detayına giderken hata:', error)
+  }
+}
+
 // Carousel Methods
-const nextSlide = () => {
-  if (currentSlide.value < featuredBooks.value.length - 1) {
-    currentSlide.value++
-  }
-}
+// const nextSlide = () => {
+//   if (currentSlide.value < featuredBooks.value.length - 1) {
+//     currentSlide.value++
+//   }
+// }
 
-const prevSlide = () => {
-  if (currentSlide.value > 0) {
-    currentSlide.value--
-  }
-}
+// const prevSlide = () => {
+//   if (currentSlide.value > 0) {
+//     currentSlide.value--
+//   }
+// }
 
-const carouselStyle = computed(() => ({
-  transform: `translateX(-${currentSlide.value * 100}%)`
-}))
+// const carouselStyle = computed(() => ({
+//   transform: `translateX(-${currentSlide.value * 100}%)`
+// }))
 
 const updateExchangeRates = async () => {
   try {
@@ -444,9 +459,36 @@ onMounted(async () => {
 }
 
 .left-section {
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.add-book-btn {
+  padding: 0.75rem 1rem;
+  background: #42b883;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-right: 1rem;
+}
+
+.add-book-btn:hover {
+  background: #3aa876;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(66, 184, 131, 0.2);
+}
+
+.add-book-btn i {
+  font-size: 1rem;
 }
 
 .filter-controls {
@@ -776,6 +818,10 @@ onMounted(async () => {
   }
   .books-container {
     grid-template-columns: 1fr;
+  }
+  .left-section {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .search-container {

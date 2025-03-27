@@ -44,9 +44,18 @@
     }).format(parseFloat(price.replace(/[^0-9.-]+/g, '')))
   }
   
-  const goToBook = (isbn13) => {
-    router.push({ name: 'book-detail', params: { isbn13 }})
+  const goToBook = async (isbn13) => {
+  try {
+    await router.push({
+      name: 'book-detail',
+      params: { isbn13: isbn13.toString() }
+    })
+    
+    window.location.reload()
+  } catch (error) {
+    console.error('Kitap detayına giderken hata:', error)
   }
+}
   
   onMounted(async () => {
     try {

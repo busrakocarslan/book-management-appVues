@@ -7,10 +7,9 @@
         <h1>Yeni Kitap Ekle</h1>
       </div>
 
-      <!-- Progress Steps -->
       <div class="step-progress">
-        <div 
-          v-for="step in steps" 
+        <div
+          v-for="step in steps"
           :key="step.id"
           :class="['step', { active: currentStep === step.id }]"
         >
@@ -25,25 +24,23 @@
           <h2>Temel Bilgiler</h2>
           <div class="form-group">
             <label for="title">Kitap Adı*</label>
-            <input 
-              type="text" 
-              id="title" 
+            <input
+              type="text"
+              id="title"
               v-model="bookData.title"
-              :class="{ 'error': v$.bookData.title.$error }"
+              :class="{ error: v$.bookData.title.$error }"
               @blur="v$.bookData.title.$touch()"
             />
-            <span class="error-text" v-if="v$.bookData.title.$error">
-              Kitap adı gereklidir
-            </span>
+            <span class="error-text" v-if="v$.bookData.title.$error"> Kitap adı gereklidir </span>
           </div>
 
           <div class="form-group">
             <label for="category">Kategori*</label>
-            <select 
-              id="category" 
+            <select
+              id="category"
               v-model="bookData.category"
               @change="handleCategoryChange"
-              :class="{ 'error': v$.bookData.category.$error }"
+              :class="{ error: v$.bookData.category.$error }"
             >
               <option value="">Seçiniz</option>
               <option v-for="cat in categories" :key="cat" :value="cat">
@@ -57,21 +54,21 @@
 
           <div class="form-group">
             <label for="authors">Yazar(lar)*</label>
-            <input 
-              type="text" 
-              id="authors" 
+            <input
+              type="text"
+              id="authors"
               v-model="bookData.authors"
-              :class="{ 'error': v$.bookData.authors.$error }"
+              :class="{ error: v$.bookData.authors.$error }"
             />
           </div>
 
           <div class="form-group">
             <label for="isbn13">ISBN13*</label>
-            <input 
-              type="text" 
-              id="isbn13" 
+            <input
+              type="text"
+              id="isbn13"
               v-model="bookData.isbn13"
-              :class="{ 'error': v$.bookData.isbn13.$error }"
+              :class="{ error: v$.bookData.isbn13.$error }"
               @blur="v$.bookData.isbn13.$touch()"
             />
             <span class="error-text" v-if="v$.bookData.isbn13.$error">
@@ -83,15 +80,15 @@
         <!-- Step 2: Detaylar ve Fiyat -->
         <div class="form-step" v-show="currentStep === 2">
           <h2>Detaylar ve Fiyat</h2>
-          
+
           <!-- Görsel Yükleme -->
           <div class="form-group">
             <label>Kitap Kapağı</label>
             <div class="image-upload" @drop.prevent="handleImageDrop" @dragover.prevent>
-              <input 
-                type="file" 
-                accept="image/*" 
-                @change="handleImageUpload" 
+              <input
+                type="file"
+                accept="image/*"
+                @change="handleImageUpload"
                 ref="fileInput"
                 class="file-input"
               />
@@ -109,11 +106,11 @@
           <div class="form-group">
             <label>Fiyat ve Para Birimi*</label>
             <div class="price-inputs">
-              <input 
-                type="number" 
+              <input
+                type="number"
                 v-model="bookData.price"
                 step="0.01"
-                :class="{ 'error': v$.bookData.price.$error }"
+                :class="{ error: v$.bookData.price.$error }"
               />
               <select v-model="bookData.currency">
                 <option v-for="curr in currencies" :key="curr" :value="curr">
@@ -121,7 +118,7 @@
                 </option>
               </select>
             </div>
-            
+
             <!-- Döviz Çevrimleri -->
             <div class="currency-conversions" v-if="bookData.price && exchangeRates">
               <p v-for="(rate, curr) in exchangeRates" :key="curr">
@@ -134,47 +131,31 @@
         <!-- Step 3: İçerik -->
         <div class="form-step" v-show="currentStep === 3">
           <h2>İçerik Bilgileri</h2>
-          
+
           <!-- Zengin Metin Editörü -->
           <div class="form-group">
             <label>Kitap Özeti*</label>
-            <QuillEditor
-              contentType="html"
-              theme="snow"
-              :options="editorOptions"
-            />
+            <QuillEditor contentType="html" theme="snow" :options="editorOptions" />
           </div>
 
           <!-- Dinamik Kategori Alanları -->
           <div v-if="categoryFields.length > 0" class="category-fields">
-            <div 
-              v-for="field in categoryFields" 
-              :key="field.name" 
-              class="form-group"
-            >
+            <div v-for="field in categoryFields" :key="field.name" class="form-group">
               <label>{{ field.label }}</label>
-              <input 
-                :type="field.type" 
-                v-model="bookData.customFields[field.name]"
-              />
+              <input :type="field.type" v-model="bookData.customFields[field.name]" />
             </div>
           </div>
         </div>
 
         <!-- Navigation -->
         <div class="form-navigation">
-          <button 
-            type="button" 
-            @click="prevStep" 
-            v-if="currentStep > 1"
-            class="nav-button"
-          >
+          <button type="button" @click="prevStep" v-if="currentStep > 1" class="nav-button">
             Önceki
           </button>
-          
-          <button 
-            type="button" 
-            @click="nextStep" 
+
+          <button
+            type="button"
+            @click="nextStep"
             v-if="currentStep < steps.length"
             class="nav-button primary"
             :disabled="!canProceed"
@@ -182,28 +163,20 @@
             Sonraki
           </button>
 
-          <button 
-            type="submit" 
-            v-if="currentStep === steps.length"
-            class="nav-button primary"
-            :disabled="v$.$invalid"
-          >
-            Kaydet
-          </button>
+          <button type="submit" v-if="currentStep === steps.length" class="nav-button primary" :disabled="v$.$invalid">Kaydet</button>
         </div>
       </form>
       <div class="currency-conversions" v-if="bookData.price && exchangeRates">
-    <h4>Diğer Para Birimlerindeki Karşılıkları:</h4>
-    <div class="conversion-grid">
-      <div v-for="(rate, curr) in filteredRates" :key="curr" class="conversion-item">
-        <strong>{{ curr }}:</strong> 
-        {{ formatPrice(convertPrice(bookData.price, curr), curr) }}
+        <h4>Diğer Para Birimlerindeki Karşılıkları:</h4>
+        <div class="conversion-grid">
+          <div v-for="(rate, curr) in filteredRates" :key="curr" class="conversion-item">
+            <strong>{{ curr }}:</strong>
+            {{ formatPrice(convertPrice(bookData.price, curr), curr) }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
-    </div>
-  </div>
-  
 </template>
 
 <script setup>
@@ -217,12 +190,12 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import debounce from 'lodash/debounce'
 
 // Constants
-const categories = ['Programming', 'Fiction', 'Science', 'Business', 'Other']
+const categories = ['Programming', 'Money', 'Career', 'Business', 'Design', 'Marketing']
 const currencies = ['USD', 'EUR', 'TRY', 'GBP']
 const steps = [
   { id: 1, title: 'Temel Bilgiler' },
   { id: 2, title: 'Detaylar ve Fiyat' },
-  { id: 3, title: 'İçerik' }
+  { id: 3, title: 'İçerik' },
 ]
 
 // Component setup
@@ -233,18 +206,17 @@ const currentStep = ref(1)
 const exchangeRates = ref(null)
 const categoryFields = ref([])
 
-// Editor options
 const editorOptions = {
   modules: {
     toolbar: [
       ['bold', 'italic', 'underline', 'strike'],
       ['blockquote', 'code-block'],
-      [{ 'header': 1 }, { 'header': 2 }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'indent': '-1'}, { 'indent': '+1' }],
-      ['clean']
-    ]
-  }
+      [{ header: 1 }, { header: 2 }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ indent: '-1' }, { indent: '+1' }],
+      ['clean'],
+    ],
+  },
 }
 
 // Form data
@@ -257,7 +229,7 @@ const bookData = reactive({
   currency: 'USD',
   image: '',
   description: '',
-  customFields: {}
+  customFields: {},
 })
 
 // Validation rules
@@ -266,12 +238,12 @@ const rules = {
     title: { required },
     category: { required },
     authors: { required },
-    isbn13: { 
+    isbn13: {
       required,
-      isISBN: helpers.regex(/^[0-9]{13}$/)
+      isISBN: helpers.regex(/^[0-9]{13}$/),
     },
-    price: { required }
-  }
+    price: { required },
+  },
 }
 
 const v$ = useVuelidate(rules, { bookData })
@@ -279,14 +251,10 @@ const v$ = useVuelidate(rules, { bookData })
 // Computed
 const canProceed = computed(() => {
   if (currentStep.value === 1) {
-    return bookData.title && 
-           bookData.category && 
-           bookData.authors && 
-           bookData.isbn13
+    return bookData.title && bookData.category && bookData.authors && bookData.isbn13
   }
   return true
 })
-
 
 // Methods
 const filteredRates = computed(() => {
@@ -299,24 +267,22 @@ const filteredRates = computed(() => {
     }, {})
 })
 
-
-
 const handleCategoryChange = () => {
   loadCategoryFields(bookData.category)
 }
 
 const loadCategoryFields = (category) => {
   const fields = {
-    'Programming': [
+    Programming: [
       { name: 'programmingLanguage', label: 'Programlama Dili', type: 'text' },
-      { name: 'difficulty', label: 'Zorluk Seviyesi', type: 'select' }
+      { name: 'difficulty', label: 'Zorluk Seviyesi', type: 'select' },
     ],
-    'Science': [
+    Science: [
       { name: 'field', label: 'Bilim Dalı', type: 'text' },
-      { name: 'academicLevel', label: 'Akademik Seviye', type: 'select' }
-    ]
+      { name: 'academicLevel', label: 'Akademik Seviye', type: 'select' },
+    ],
   }
-  
+
   categoryFields.value = fields[category] || []
 }
 
@@ -348,9 +314,9 @@ const convertPrice = (price, toCurrency) => {
 }
 
 const formatPrice = (amount, currency) => {
-  return new Intl.NumberFormat('tr-TR', { 
-    style: 'currency', 
-    currency 
+  return new Intl.NumberFormat('tr-TR', {
+    style: 'currency',
+    currency,
   }).format(amount)
 }
 
@@ -368,20 +334,78 @@ const prevStep = () => {
 
 const handleSubmit = async () => {
   try {
-    const isValid = await v$.value.$validate()
-    if (!isValid) return
-
-    await store.dispatch('books/addBook', {
-      ...bookData,
-      customFields: Object.keys(bookData.customFields).length > 0 
-        ? bookData.customFields 
-        : undefined
-    })
+    console.log("Form gönderiliyor...")
     
-    router.push('/')
+    // Form validasyonu
+    const isValid = await v$.value.$validate()
+    if (!isValid) {
+      console.log("Validasyon hatası:", v$.value.$errors)
+      alert('Lütfen tüm zorunlu alanları doldurun')
+      return
+    }
+    
+    console.log("Kullanıcı durumu:", store.getters['auth/isAuthenticated'], store.state.auth.user)
+    
+    // Kitap verilerini hazırla
+    const newBook = {
+      isbn13: bookData.isbn13,
+      title: bookData.title,
+      authors: bookData.authors,
+      category: bookData.category,
+      price: `$${bookData.price}`,
+      image: bookData.image || 'https://picsum.photos/200/300',
+      desc: bookData.description,
+      customFields: bookData.customFields,
+      addedAt: new Date().toISOString()
+    }
+    
+    console.log("Eklenecek kitap:", newBook)
+
+    // Kitabı ekle ve sonucu bekle
+    try {
+      const result = await store.dispatch('books/addBook', newBook)
+      console.log("Ekleme sonucu:", result)
+      
+      if (result) {
+        alert('Kitap başarıyla eklendi!')
+        
+        // Önce form verilerini temizle
+        resetForm()
+        console.log("Form temizlendi")
+        
+        // Sonra yönlendirmeyi yap
+        console.log("Profile sayfasına yönlendiriliyor...")
+        await router.push('/profile')
+        
+        // Profil sayfasında kitapları yeniden yükle
+        console.log("Kitaplar yeniden yükleniyor...")
+        await store.dispatch('books/loadUserBooks')
+      }
+    } catch (innerError) {
+      console.error("Kitap ekleme alt hatası:", innerError)
+      alert(`Kitap eklenirken hata: ${innerError.message}`)
+    }
   } catch (error) {
-    console.error('Error adding book:', error)
+    console.error('Kitap eklenirken ana hata:', error.stack || error)
+    alert(`Kitap eklenirken hata: ${error.message || 'Bilinmeyen hata'}`)
   }
+}
+
+const resetForm = () => {
+  // Form verilerini sıfırla
+  Object.keys(bookData).forEach(key => {
+    if (typeof bookData[key] === 'string') {
+      bookData[key] = ''
+    } else if (typeof bookData[key] === 'object') {
+      bookData[key] = {}
+    }
+  })
+   // Varsayılan değerleri ayarla
+   bookData.currency = 'USD'
+  currentStep.value = 1
+  
+  // Validasyon durumunu sıfırla
+  if (v$.value) v$.value.$reset()
 }
 
 // Lifecycle hooks
@@ -446,7 +470,7 @@ onMounted(async () => {
   background: white;
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .form-step {
@@ -463,7 +487,9 @@ label {
   color: #2c3e50;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #ddd;
@@ -471,7 +497,9 @@ input, select, textarea {
   font-size: 1rem;
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   outline: none;
   border-color: #42b883;
 }

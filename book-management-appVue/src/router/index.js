@@ -6,6 +6,7 @@ import AddBookView from '../views/books/AddBookView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
 import ForgotPasswordView from '../views/auth/ForgotPassword.vue'
 import ProfileView from '../views/ProfileView.vue'
+import store from '../store'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -55,12 +56,13 @@ const router = createRouter({
   ]
 })
 
-// Navigation Guard
+// Navigation Guard: Giriş yapılmamışsa ilgili sayfalara erişimi engelle
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('user-token')
-  
+  const isAuthenticated = store.getters['auth/isAuthenticated']
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/login')
+    next({ name: 'login' })
+  } else if (to.meta.requiresGuest && isAuthenticated) {
+    next({ name: 'home' })
   } else {
     next()
   }

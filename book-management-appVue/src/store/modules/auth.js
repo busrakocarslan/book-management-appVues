@@ -133,7 +133,7 @@ export default {
         await new Promise(resolve => setTimeout(resolve, 1000))
         return { 
           success: true, 
-          message: 'Password reset instructions have been sent to your email.' 
+          message: 'Şifre sıfırlama talimatları e-postanıza gönderildi.' 
         }
       } catch (error) {
         commit('SET_ERROR', 'Failed to process password reset request.')
