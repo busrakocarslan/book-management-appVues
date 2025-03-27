@@ -2,7 +2,6 @@
     <div class="reviews-section">
       <h3>Kitap İncelemeleri</h3>
       
-      <!-- Yorum Yazma Formu -->
       <div class="reviews-section">
     <h3>Kitap İncelemeleri</h3>
     
@@ -48,7 +47,6 @@
     </div>
 
   
-      <!-- Yorumlar Listesi -->
       <div class="reviews-list">
         <div v-for="review in reviews" 
              :key="review.id" 

@@ -7,47 +7,37 @@ export const bookService = {
     try {
       const url = query ? `/search/${query}` : '/new'
       const response = await axios.get(`${BASE_URL}${url}`)
-      console.log('API Response:', response.data)
-      
-      // API'den gelen kitaplara varsayılan kategori ve dil değerleri atayalım
-      // Çünkü bu bilgiler listede yoksa detay sayfasından almamız gerekiyor
+      console.log('API Response:', response.data)      
+    
       const books = response.data.books || []
       return books.map(book => ({
         ...book,
-        language: book.language || 'en', // Varsayılan olarak İngilizce
-        category: book.category || 'Programming', // Varsayılan olarak Programlama
-        year: book.year || new Date().getFullYear() // Yıl yoksa güncel yıl
+        language: book.language || 'en', 
+        category: book.category || 'Programming',
+        year: book.year || new Date().getFullYear() 
       }))
     } catch (error) {
       console.error('API Error:', error)
-      throw error
+      throw new Error('Kitaplar yüklenirken bir hata oluştu')
     }
   },
 
   async getBookDetail(isbn13) {
     try {
       const response = await axios.get(`${BASE_URL}/books/${isbn13}`)
-      console.log('Book detail:', response.data)
       return response.data
     } catch (error) {
-      console.error('Error fetching book detail:', error)
       throw error
     }
   },
 
-  async getRelatedBooks(category) {
+  async getRelatedBooks(category = 'programming') {
     try {
      
-      const searchTerm = category || 'programming' 
-      const response = await axios.get(`${BASE_URL}/search/${searchTerm}`)
-      
-      if (response.data && response.data.books) {
-        console.log('Related books found:', response.data.books.length)
-        return response.data.books
-      }
-      return []
+      const response = await axios.get(`${BASE_URL}/search/$/${category}}`)      
+      return response.data && response.data.books || []     
     } catch (error) {
-      console.error('Error fetching related books:', error)
+      console.error('İlgili kitaplar yüklenirken hata:', error.message)
       return []
     }
   }

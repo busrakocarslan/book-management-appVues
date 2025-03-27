@@ -1,11 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import LoginView from '../views/auth/LoginView.vue'
-import BookDetailView from '../views/books/BookDetailView.vue'
-import AddBookView from '../views/books/AddBookView.vue'
-import RegisterView from '../views/auth/RegisterView.vue'
-import ForgotPasswordView from '../views/auth/ForgotPassword.vue'
-import ProfileView from '../views/ProfileView.vue'
 import store from '../store'
 
 const router = createRouter({
@@ -14,49 +7,49 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: () => import('../views/HomeView.vue'),// lazyloading için en baştan import etmiyorum
       meta: { requiresAuth: true }// sadece giriş yapmış kullanıcıların görebilmesi için ekledim.
     },
     {
       path: '/login',
       name: 'login',
-      component: LoginView
+      component: () => import('../views/auth/LoginView.vue'),
     },
     {
       path: '/register',
       name: 'register',
-      component: RegisterView,
+      component: () => import('../views/auth/RegisterView.vue'),
       meta: { requiresGuest: true }
     },
     {
       path: '/forgot-password',
       name: 'forgot-password',
-      component: ForgotPasswordView,
+      component: () => import('../views/auth/ForgotPassword.vue'),
       meta: { requiresGuest: true }
     },
     {
       path: '/profile',
       name: 'profile',
-      component: ProfileView,
+      component: () => import('../views/ProfileView.vue'),
       meta: { requiresAuth: true }
     },
     {
       path: '/book/:isbn13',
       name: 'book-detail',
-      component: BookDetailView,
+      component: () => import('../views/books/BookDetailView.vue'),
       meta: { requiresAuth: true }
     },
     {
       path:'/add-book',
       name: 'add-book',
-      component:AddBookView,
+      component: () => import('../views/books/AddBookView.vue'),
       meta: { requiresAuth: true }
     }
 
   ]
 })
 
-// Navigation Guard: Giriş yapılmamışsa ilgili sayfalara erişimi engelle
+// Navigation Guard: Giriş yapılmamışsa ilgili sayfalara erişimi engellemek için ekledim.
 router.beforeEach((to, from, next) => {
   const isAuthenticated = store.getters['auth/isAuthenticated']
   if (to.meta.requiresAuth && !isAuthenticated) {

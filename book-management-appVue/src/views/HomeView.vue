@@ -355,7 +355,6 @@ const updateExchangeRates = async () => {
   try {
     const rates = await currencyService.getRates('USD')
     exchangeRates.value = rates
-    console.log('Exchange rates updated:', rates)
   } catch (err) {
     console.error('Error updating exchange rates:', err)
   }

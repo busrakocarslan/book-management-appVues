@@ -6,7 +6,6 @@ export const currencyService = {
   async getRates(base = 'USD') {
     try {
       const response = await axios.get(`${BASE_URL}/${base}`)
-      
       if (response.data && response.data.rates) {
         return response.data.rates
       } else {
@@ -16,12 +15,10 @@ export const currencyService = {
       console.error('Döviz kuru servisi hatası:', error)
       throw error
     }
-  }
+  },
 }
 
-
 // ücretsiz hakkım bittiğinden yeni api ye geçtim
-
 
 // const API_KEY = import.meta.env.VITE_CURRENCY_API_KEY// import meta env vıte şeklinde kullanmadığımda api keyi bulamadı
 // const BASE_URL = 'https://api.collectapi.com/economy/currencyToAll'

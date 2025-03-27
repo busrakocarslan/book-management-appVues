@@ -3,35 +3,20 @@
     <BlurBackground />
     <form @submit.prevent="handleRegister" class="register-form">
       <h2>Kayıt Ol</h2>
-      
+
       <div class="form-group">
         <label for="name">Ad Soyad</label>
-        <input 
-          type="text" 
-          id="name" 
-          v-model="formData.name"
-          required
-        />
+        <input type="text" id="name" v-model="formData.name" required />
       </div>
 
       <div class="form-group">
         <label for="email">E-posta</label>
-        <input 
-          type="email" 
-          id="email" 
-          v-model="formData.email"
-          required
-        />
+        <input type="email" id="email" v-model="formData.email" required />
       </div>
 
       <div class="form-group">
         <label for="password">Şifre</label>
-        <input 
-          type="password" 
-          id="password" 
-          v-model="formData.password"
-          required
-        />
+        <input type="password" id="password" v-model="formData.password" required />
       </div>
 
       <button type="submit" :disabled="loading">
@@ -43,7 +28,7 @@
       </div>
 
       <p class="login-link">
-        Zaten hesabınız var mı? 
+        Zaten hesabınız var mı?
         <router-link to="/login">Giriş Yap</router-link>
       </p>
     </form>
@@ -62,7 +47,7 @@ const router = useRouter()
 const formData = reactive({
   name: '',
   email: '',
-  password: ''
+  password: '',
 })
 
 const loading = computed(() => store.getters['auth/isLoading'])
@@ -73,7 +58,7 @@ const handleRegister = async () => {
     await store.dispatch('auth/register', formData)
     router.push('/')
   } catch (err) {
-    console.error('Kayıt başarısız:', err)
+     error.value = 'Kayıt işlemi başarısız oldu:'
   }
 }
 </script>
@@ -91,7 +76,7 @@ const handleRegister = async () => {
   background: white;
   padding: 4rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
 }

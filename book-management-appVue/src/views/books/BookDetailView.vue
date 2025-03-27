@@ -3,27 +3,25 @@
     <div class="container">
       <div class="book-header">
         <button class="back-button" @click="router.back()">← Geri</button>
-
         <h1>{{ book.title }}</h1>
       </div>
-
       <div class="book-content">
         <div class="book-image-container">
           <button class="favorite-button" @click="toggleFavorite" :class="{ active: isFavorite }">
-            <i class="fas" :class="isFavorite ? 'fa-heart' : 'fa-heart-o'"></i>
+            ❤
           </button>
           <img :src="book.image" :alt="book.title" class="book-image" />
           <div class="price-tag">{{ book.price }}</div>
+          <a :href="book.url" target="_blank" rel="noopener noreferrer" class="buy-button">
+            <i class="fas fa-shopping-cart"></i> Satın Al
+          </a>
         </div>
 
         <BookMetaInfo :book="book" />
         <BookReviews :bookId="book.isbn13" :currentUserId="currentUserId" />
-       
-      <BookDescription 
-  :description="book.desc" 
-  :pdfLink="book.pdf"
-/>
-       
+
+        <BookDescription :description="book.desc" :pdfLink="book.pdf" />
+
         <SocialShare :title="book.title" :url="currentUrl" />
         <RelatedBooks :category="book.category" :currentBookId="book.isbn13" />
       </div>
@@ -34,8 +32,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import { bookService } from '@/services/bookService'
 import BookMetaInfo from '@/components/BookDetail/BookMetaInfo.vue'
 import BookReviews from '@/components/BookDetail/BookReviews.vue'
@@ -45,22 +44,34 @@ import BookDescription from '@/components/BookDetail/BookDescription.vue'
 
 const route = useRoute()
 const router = useRouter()
+const store = useStore()
 const book = ref(null)
 const loading = ref(true)
 
+const isFavorite = computed(() => store.getters['books/isFavorite'](book.value?.isbn13))
+
+const currentUserId = computed(() => store.getters['auth/currentUser']?.id)
+
+const currentUrl = computed(() => window.location.href)
+
 const toggleFavorite = () => {
+  if (!book.value) return
   store.dispatch('books/toggleFavorite', book.value)
 }
 
-onMounted(async () => {
+const loadBookDetails = async (isbn13) => {
   try {
-    const isbn13 = route.params.isbn13
+    loading.value = true
     book.value = await bookService.getBookDetail(isbn13)
   } catch (error) {
     console.error('Error fetching book details:', error)
   } finally {
     loading.value = false
   }
+}
+
+onMounted(() => {
+  loadBookDetails(route.params.isbn13)
 })
 </script>
 
@@ -77,26 +88,24 @@ onMounted(async () => {
   position: absolute;
   top: 1rem;
   left: 1rem;
-  background: white;
   border: none;
   border-radius: 50%;
+  background: white;
   width: 40px;
   height: 40px;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
+  color: gray;
 }
 
 .favorite-button.active {
   background: #ff4757;
   color: white;
-}
-.favorite-button:hover {
-  transform: scale(1.1);
 }
 
 .book-header {
@@ -140,43 +149,30 @@ onMounted(async () => {
   font-weight: bold;
 }
 
-.book-info {
-  padding: 1rem;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  margin: 2rem 0;
-}
-
-.info-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.description {
-  margin: 2rem 0;
-}
-
-.description h3 {
-  margin-bottom: 1rem;
-}
-
 .buy-button {
-  display: inline-block;
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   background: #42b883;
   color: white;
-  padding: 1rem 2rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 4px;
   text-decoration: none;
   font-weight: bold;
-  transition: background 0.2s;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .buy-button:hover {
   background: #3aa876;
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 768px) {
@@ -187,6 +183,17 @@ onMounted(async () => {
   .book-image-container {
     max-width: 300px;
     margin: 0 auto;
+  }
+  .buy-button {
+    position: static;
+    transform: none;
+    width: 80%;
+    margin-top: 1rem;
+    justify-content: center;
+  }
+
+  .buy-button:hover {
+    transform: translateY(-2px);
   }
 }
 </style>

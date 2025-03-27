@@ -1,7 +1,6 @@
 <template>
   <div class="add-book">
     <div class="container">
-      <!-- Header -->
       <div class="form-header">
         <button class="back-button" @click="router.back()">← Geri</button>
         <h1>Yeni Kitap Ekle</h1>
@@ -17,7 +16,6 @@
         </div>
       </div>
 
-      <!-- Form -->
       <form @submit.prevent="handleSubmit" class="book-form">
         <!-- Step 1: Temel Bilgiler -->
         <div class="form-step" v-show="currentStep === 1">
@@ -81,7 +79,6 @@
         <div class="form-step" v-show="currentStep === 2">
           <h2>Detaylar ve Fiyat</h2>
 
-          <!-- Görsel Yükleme -->
           <div class="form-group">
             <label>Kitap Kapağı</label>
             <div class="image-upload" @drop.prevent="handleImageDrop" @dragover.prevent>
@@ -102,7 +99,6 @@
             </div>
           </div>
 
-          <!-- Fiyat Bilgileri -->
           <div class="form-group">
             <label>Fiyat ve Para Birimi*</label>
             <div class="price-inputs">
@@ -132,13 +128,11 @@
         <div class="form-step" v-show="currentStep === 3">
           <h2>İçerik Bilgileri</h2>
 
-          <!-- Zengin Metin Editörü -->
           <div class="form-group">
             <label>Kitap Özeti*</label>
             <QuillEditor contentType="html" theme="snow" :options="editorOptions" />
           </div>
 
-          <!-- Dinamik Kategori Alanları -->
           <div v-if="categoryFields.length > 0" class="category-fields">
             <div v-for="field in categoryFields" :key="field.name" class="form-group">
               <label>{{ field.label }}</label>
@@ -163,7 +157,14 @@
             Sonraki
           </button>
 
-          <button type="submit" v-if="currentStep === steps.length" class="nav-button primary" :disabled="v$.$invalid">Kaydet</button>
+          <button
+            type="submit"
+            v-if="currentStep === steps.length"
+            class="nav-button primary"
+            :disabled="v$.$invalid"
+          >
+            Kaydet
+          </button>
         </div>
       </form>
       <div class="currency-conversions" v-if="bookData.price && exchangeRates">
@@ -187,9 +188,7 @@ import { useVuelidate } from '@vuelidate/core'
 import { required, helpers } from '@vuelidate/validators'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import debounce from 'lodash/debounce'
 
-// Constants
 const categories = ['Programming', 'Money', 'Career', 'Business', 'Design', 'Marketing']
 const currencies = ['USD', 'EUR', 'TRY', 'GBP']
 const steps = [
@@ -198,7 +197,6 @@ const steps = [
   { id: 3, title: 'İçerik' },
 ]
 
-// Component setup
 const router = useRouter()
 const store = useStore()
 const fileInput = ref(null)
@@ -219,7 +217,6 @@ const editorOptions = {
   },
 }
 
-// Form data
 const bookData = reactive({
   title: '',
   category: '',
@@ -232,7 +229,6 @@ const bookData = reactive({
   customFields: {},
 })
 
-// Validation rules
 const rules = {
   bookData: {
     title: { required },
@@ -243,20 +239,19 @@ const rules = {
       isISBN: helpers.regex(/^[0-9]{13}$/),
     },
     price: { required },
+    
   },
 }
 
 const v$ = useVuelidate(rules, { bookData })
 
-// Computed
 const canProceed = computed(() => {
   if (currentStep.value === 1) {
     return bookData.title && bookData.category && bookData.authors && bookData.isbn13
   }
   return true
 })
-
-// Methods
+// fonksiyonlar
 const filteredRates = computed(() => {
   if (!exchangeRates.value) return {}
   return Object.entries(exchangeRates.value)
@@ -334,83 +329,59 @@ const prevStep = () => {
 
 const handleSubmit = async () => {
   try {
-    console.log("Form gönderiliyor...")
-    
-    // Form validasyonu
     const isValid = await v$.value.$validate()
     if (!isValid) {
-      console.log("Validasyon hatası:", v$.value.$errors)
       alert('Lütfen tüm zorunlu alanları doldurun')
       return
     }
-    
-    console.log("Kullanıcı durumu:", store.getters['auth/isAuthenticated'], store.state.auth.user)
-    
-    // Kitap verilerini hazırla
+
     const newBook = {
       isbn13: bookData.isbn13,
       title: bookData.title,
       authors: bookData.authors,
       category: bookData.category,
       price: `$${bookData.price}`,
-      image: bookData.image || 'https://picsum.photos/200/300',
+      image: bookData.image,
       desc: bookData.description,
       customFields: bookData.customFields,
-      addedAt: new Date().toISOString()
+      addedAt: new Date().toISOString(),
     }
-    
-    console.log("Eklenecek kitap:", newBook)
 
-    // Kitabı ekle ve sonucu bekle
     try {
       const result = await store.dispatch('books/addBook', newBook)
-      console.log("Ekleme sonucu:", result)
-      
+
       if (result) {
         alert('Kitap başarıyla eklendi!')
-        
-        // Önce form verilerini temizle
+
         resetForm()
-        console.log("Form temizlendi")
-        
-        // Sonra yönlendirmeyi yap
-        console.log("Profile sayfasına yönlendiriliyor...")
+
         await router.push('/profile')
-        
-        // Profil sayfasında kitapları yeniden yükle
-        console.log("Kitaplar yeniden yükleniyor...")
+
         await store.dispatch('books/loadUserBooks')
       }
     } catch (innerError) {
-      console.error("Kitap ekleme alt hatası:", innerError)
       alert(`Kitap eklenirken hata: ${innerError.message}`)
     }
   } catch (error) {
-    console.error('Kitap eklenirken ana hata:', error.stack || error)
     alert(`Kitap eklenirken hata: ${error.message || 'Bilinmeyen hata'}`)
   }
 }
 
 const resetForm = () => {
-  // Form verilerini sıfırla
-  Object.keys(bookData).forEach(key => {
+  Object.keys(bookData).forEach((key) => {
     if (typeof bookData[key] === 'string') {
       bookData[key] = ''
     } else if (typeof bookData[key] === 'object') {
       bookData[key] = {}
     }
   })
-   // Varsayılan değerleri ayarla
-   bookData.currency = 'USD'
+  bookData.currency = 'USD'
   currentStep.value = 1
-  
-  // Validasyon durumunu sıfırla
+
   if (v$.value) v$.value.$reset()
 }
 
-// Lifecycle hooks
 onMounted(async () => {
-  // Döviz kurlarını yükle
   try {
     const rates = await store.dispatch('currency/fetchRates')
     exchangeRates.value = rates
