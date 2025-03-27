@@ -1,26 +1,16 @@
 <template>
   <div class="home">
-    <!-- Header Section -->
     <div class="header">
       <div class="left-section">
         <h1>Kitap Listesi</h1>
-        <button 
-      @click="router.push('/add-book')" 
-      class="add-book-btn"
-    >
-      <i class="fas fa-plus"></i>Kitap Ekle
-    </button>
+        <button @click="router.push('/add-book')" class="add-book-btn">
+          <i class="fas fa-plus"></i>Kitap Ekle
+        </button>
         <div class="view-controls">
-          <button 
-            :class="['view-btn', { active: viewMode === 'grid' }]"
-            @click="viewMode = 'grid'"
-          >
+          <button :class="['view-btn', { active: viewMode === 'grid' }]" @click="viewMode = 'grid'">
             <i class="fas fa-th"></i> Grid
           </button>
-          <button 
-            :class="['view-btn', { active: viewMode === 'list' }]"
-            @click="viewMode = 'list'"
-          >
+          <button :class="['view-btn', { active: viewMode === 'list' }]" @click="viewMode = 'list'">
             <i class="fas fa-list"></i> Liste
           </button>
         </div>
@@ -28,9 +18,9 @@
 
       <div class="filter-controls">
         <div class="search-container">
-          <input 
-            type="text" 
-            v-model="searchQuery" 
+          <input
+            type="text"
+            v-model="searchQuery"
             @input="handleSearch"
             placeholder="Kitap ara..."
             class="search-input"
@@ -55,40 +45,13 @@
       </div>
     </div>
 
-    <!-- Featured Books Carousel -->
-    <div class="featured-books" v-if="featuredBooks.length">
-      <h2>Öne Çıkan Kitaplar</h2>
-      <div class="carousel">
-        <button class="carousel-btn prev" @click="prevSlide">❮</button>
-        <div class="carousel-track" :style="carouselStyle">
-          <div 
-            v-for="(book) in featuredBooks" 
-            :key="book.isbn13"
-            class="carousel-item"
-          >
-            <img :src="book.image" :alt="book.title">
-            <div class="carousel-info">
-              <h3>{{ book.title }}</h3>
-              <p>{{ formatPrice(book.price) }}</p>
-            </div>
-          </div>
-        </div>
-        <button class="carousel-btn next" @click="nextSlide">❯</button>
-      </div>
-    </div>
-
-    <!-- Filters Panel -->
     <div v-if="showFilters" class="filters-panel">
       <div class="filter-grid">
         <div class="filter-group">
           <h3>Kategoriler</h3>
           <div class="checkbox-group">
             <label v-for="cat in categories" :key="cat">
-              <input 
-                type="checkbox" 
-                v-model="filters.categories" 
-                :value="cat"
-              > {{ cat }}
+              <input type="checkbox" v-model="filters.categories" :value="cat" /> {{ cat }}
             </label>
           </div>
         </div>
@@ -96,222 +59,210 @@
         <div class="filter-group">
           <h3>Dil</h3>
           <select v-model="filters.language" multiple class="language-select">
-    <option v-for="lang in availableLanguages" :key="lang.value" :value="lang.value">
-      {{ lang.label }}
-    </option>
-  </select>
+            <option v-for="lang in availableLanguages" :key="lang.value" :value="lang.value">
+              {{ lang.label }}
+            </option>
+          </select>
         </div>
 
         <div class="filter-group">
           <h3>Fiyat Aralığı ($)</h3>
           <div class="range-inputs">
-            <input 
-              type="number" 
-              v-model.number="filters.price.min" 
-              placeholder="Min"
-            >
+            <input type="number" v-model.number="filters.price.min" placeholder="Min" />
             <span>-</span>
-            <input 
-              type="number" 
-              v-model.number="filters.price.max" 
-              placeholder="Max"
-            >
+            <input type="number" v-model.number="filters.price.max" placeholder="Max" />
           </div>
         </div>
 
         <div class="filter-group">
           <h3>Yayın Yılı</h3>
           <div class="range-inputs">
-            <input 
-              type="number" 
-              v-model.number="filters.year.min" 
-              placeholder="Başlangıç"
-            >
+            <input type="number" v-model.number="filters.year.min" placeholder="Başlangıç" />
             <span>-</span>
-            <input 
-              type="number" 
-              v-model.number="filters.year.max" 
-              placeholder="Bitiş"
-            >
+            <input type="number" v-model.number="filters.year.max" placeholder="Bitiş" />
           </div>
         </div>
 
         <label class="filter-group">
-          <input 
-            type="checkbox" 
-            v-model="filters.freeOnly"
-          > Sadece Ücretsiz İçerik
+          <input type="checkbox" v-model="filters.freeOnly" /> Sadece Ücretsiz İçerik
         </label>
       </div>
     </div>
 
-    <!-- Books Grid/List -->
-    <div 
+    <div
       :class="['books-container', viewMode]"
       v-infinite-scroll="loadMore"
       infinite-scroll-disabled="loading"
       infinite-scroll-distance="10"
     >
-      <div 
-        v-for="book in filteredBooks" 
-        :key="book.isbn13" 
-        class="book-item"
-      >
-        <div class="book-image">
-          <img :src="book.image" :alt="book.title">
-          <button 
-            :class="['favorite-btn', { active: isFavorite(book.isbn13) }]"
-            @click="toggleFavorite(book)"
-          >
-            ❤
-          </button>
-        </div>
-        <div class="book-info">
-          <h3>{{ book.title }}</h3>
-          <p class="subtitle">{{ book.subtitle }}</p>
-          <p class="price">{{ formatPrice(book.price) }}</p>
-          <div class="book-meta">
-            <span class="year">{{ book.year }}</span>
-            <span class="language">{{ book.language }}</span>
+      <!-- grid kısmı -->
+      <template v-if="viewMode === 'grid'">
+        <div v-for="book in filteredBooks" :key="book.isbn13" class="book-item">
+          <div class="book-image">
+            <img :src="book.image" :alt="book.title" />
+            <button
+              :class="['favorite-btn', { active: isFavorite(book.isbn13) }]"
+              @click="toggleFavorite(book)"
+            >
+              ❤
+            </button>
           </div>
-          <button @click="viewDetails(book.isbn13)" class="details-btn">
-            Detayları Gör
-          </button>
+          <div class="book-info">
+            <h3>{{ book.title }}</h3>
+            <p class="subtitle">{{ book.subtitle }}</p>
+            <p class="price">{{ formatPrice(book.price) }}</p>
+            <div class="book-meta">
+              <span class="year">{{ book.year }}</span>
+              <span class="language">{{ book.language }}</span>
+            </div>
+            <button @click="viewDetails(book.isbn13)" class="details-btn">Detayları Gör</button>
+          </div>
         </div>
-      </div>
+      </template>
+
+      <!-- Liste kısmı -->
+      <template v-else>
+        <div class="table-container">
+          <table class="books-table">
+            <thead>
+              <tr>
+                <th>Görsel</th>
+                <th>Başlık</th>
+                <th>Yazar</th>
+                <th>Yıl</th>
+                <th>Dil</th>
+                <th>Fiyat</th>
+                <th>İşlemler</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="book in filteredBooks" :key="book.isbn13">
+                <td class="book-image-cell">
+                  <img :src="book.image" :alt="book.title" />
+                </td>
+                <td class="book-title-cell">
+                  <div class="book-title">{{ shortText(book.title, 70) }}</div>
+                  <div class="book-subtitle">{{ shortText(book.subtitle, 70) }}</div>
+                </td>
+                <td>{{ book.authors }}</td>
+                <td>{{ book.year }}</td>
+                <td>{{ book.language }}</td>
+                <td>{{ formatPrice(book.price) }}</td>
+                <td class="actions-cell">
+                  <button
+                    :class="['favorite-btn-table', { active: isFavorite(book.isbn13) }]"
+                    @click="toggleFavorite(book)"
+                  >
+                    ❤
+                  </button>
+                  <button class="details-btn-table" @click="viewDetails(book.isbn13)">
+                    Detaylar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
-
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import debounce from 'lodash/debounce'
-import VueInfiniteScroll from 'vue-infinite-scroll'
-import { currencyService } from '@/services/currencyService' 
+import { currencyService } from '@/services/currencyService'
 
 const store = useStore()
 const router = useRouter()
 
-// State
 const viewMode = ref('grid')
 const searchQuery = ref('')
 const showFilters = ref(false)
 const currency = ref('TRY')
 const sortBy = ref('title')
-const currentSlide = ref(0)
 const exchangeRates = ref(null)
-const categories = ref([
-  'Programming',
-  'Money',
-  'Career',
-  'Business',
-  'Design',
-  'Marketing',  
-])
+const categories = ref(['Programming', 'Money', 'Career', 'Business', 'Design', 'Marketing'])
 const availableLanguages = ref([
   { value: 'en', label: 'İngilizce' },
   { value: 'tr', label: 'Türkçe' },
   { value: 'de', label: 'Almanca' },
   { value: 'fr', label: 'Fransızca' },
   { value: 'it', label: 'İtalyanca' },
-  { value: 'pt', label: 'Portekizce' }
-]);
+  { value: 'pt', label: 'Portekizce' },
+])
 const filters = ref({
   categories: [],
   language: [],
   price: { min: null, max: null },
   year: { min: null, max: null },
-  freeOnly: false
+  freeOnly: false,
 })
 
-
-
-// Computed
 const books = computed(() => store.getters['books/getAllBooks'])
 const loading = computed(() => store.state.books.loading)
-const error = computed(() => store.state.books.error)
-
-const featuredBooks = computed(() => 
-  books.value.filter(book => parseFloat(book.price) > 30).slice(0, 5)
-)
 
 const filteredBooks = computed(() => {
   let result = [...books.value]
 
-  // Filtreler
-    // Kategori filtresi
-    if (filters.value.categories.length > 0) {
-    console.log('Applying category filter:', filters.value.categories)
-    result = result.filter(book => {
+  // Filtreler kısmı
+
+  // Kategori filtresi
+  if (filters.value.categories.length > 0) {
+    result = result.filter((book) => {
       if (!book.category) return false
       return filters.value.categories.includes(book.category)
     })
-    console.log('After category filter:', result.length, 'books')
   }
 
-    // Dil filtresi
-    if (filters.value.language.length > 0) {
-    console.log('Applying language filter:', filters.value.language)
-    result = result.filter(book => {
-      // Dil API'den gelmediyse ya da net değilse kontrolü
+  // Dil filtresi
+  if (filters.value.language.length > 0) {
+    result = result.filter((book) => {
       if (!book.language) return false
       return filters.value.language.includes(book.language)
     })
-    console.log('After language filter:', result.length, 'books')
   }
   // Yayın yılı filtresi
-if (filters.value.year.min !== null) {
-  console.log('Applying min year filter:', filters.value.year.min)
-  result = result.filter(book => {
-    const year = parseInt(book.year) || 0
-    return year >= filters.value.year.min
-  })
-}
+  if (filters.value.year.min !== null) {
+    result = result.filter((book) => {
+      const year = parseInt(book.year) || 0
+      return year >= filters.value.year.min
+    })
+  }
 
-if (filters.value.year.max !== null) {
-  console.log('Applying max year filter:', filters.value.year.max)
-  result = result.filter(book => {
-    const year = parseInt(book.year) || 0
-    return year <= filters.value.year.max
-  })
-}
+  if (filters.value.year.max !== null) {
+    result = result.filter((book) => {
+      const year = parseInt(book.year) || 0
+      return year <= filters.value.year.max
+    })
+  }
 
   // Fiyat aralığı filtresi
   if (filters.value.price.min !== null) {
-    console.log('Applying min price filter:', filters.value.price.min)
-    result = result.filter(book => {
-      const price = typeof book.price === 'string' ? 
-        parseFloat(book.price.replace(/[^0-9.]/g, '')) : 
-        book.price
+    result = result.filter((book) => {
+      const price =
+        typeof book.price === 'string' ? parseFloat(book.price.replace(/[^0-9.]/g, '')) : book.price
       return price >= filters.value.price.min
     })
-    console.log('After min price filter:', result.length, 'books')
   }
 
   if (filters.value.price.max !== null) {
-    console.log('Applying max price filter:', filters.value.price.max)
-    result = result.filter(book => {
-      const price = typeof book.price === 'string' ? 
-        parseFloat(book.price.replace(/[^0-9.]/g, '')) : 
-        book.price
+    result = result.filter((book) => {
+      const price =
+        typeof book.price === 'string' ? parseFloat(book.price.replace(/[^0-9.]/g, '')) : book.price
       return price <= filters.value.price.max
     })
-    console.log('After max price filter:', result.length, 'books')
   }
 
-    // Ücretsiz içerik
-    if (filters.value.freeOnly) {
-    console.log('Applying free only filter')
-    result = result.filter(book => {
-      const price = typeof book.price === 'string' ? 
-        parseFloat(book.price.replace(/[^0-9.]/g, '')) : 
-        book.price
+  // Ücretsiz içerik
+  if (filters.value.freeOnly) {
+    result = result.filter((book) => {
+      const price =
+        typeof book.price === 'string' ? parseFloat(book.price.replace(/[^0-9.]/g, '')) : book.price
       return price === 0
     })
-    console.log('After free only filter:', result.length, 'books')
   }
 
   result.sort((a, b) => {
@@ -323,12 +274,10 @@ if (filters.value.year.max !== null) {
         const yearB = b.year ? parseInt(b.year) : 0
         return yearB - yearA
       case 'price':
-        const priceA = typeof a.price === 'string' ? 
-          parseFloat(a.price.replace(/[^0-9.]/g, '')) : 
-          a.price || 0
-        const priceB = typeof b.price === 'string' ? 
-          parseFloat(b.price.replace(/[^0-9.]/g, '')) : 
-          b.price || 0
+        const priceA =
+          typeof a.price === 'string' ? parseFloat(a.price.replace(/[^0-9.]/g, '')) : a.price || 0
+        const priceB =
+          typeof b.price === 'string' ? parseFloat(b.price.replace(/[^0-9.]/g, '')) : b.price || 0
         return priceA - priceB
       default:
         return 0
@@ -364,9 +313,7 @@ const formatPrice = (price) => {
   if (!price) return 'Ücretsiz'
 
   // $ işaretini kaldır ve sayıya çevir
-  const usdAmount = typeof price === 'string' ? 
-    parseFloat(price.replace(/[^0-9.]/g, '')) : 
-    price
+  const usdAmount = typeof price === 'string' ? parseFloat(price.replace(/[^0-9.]/g, '')) : price
 
   if (isNaN(usdAmount)) return 'Ücretsiz'
 
@@ -383,64 +330,49 @@ const formatPrice = (price) => {
     style: 'currency',
     currency: currency.value,
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   }).format(finalAmount)
+}
+
+// tablodaki uzuun açıklamayı kısaltmak için
+const shortText = (text, maxLength) => {
+  if (text.length <= maxLength) return text
+  return text.slice(0, maxLength) + '...'
 }
 
 const viewDetails = async (isbn13) => {
   try {
     await router.push({
       name: 'book-detail',
-      params: { isbn13: isbn13.toString() }
+      params: { isbn13: isbn13.toString() },
     })
   } catch (error) {
     console.error('Kitap detayına giderken hata:', error)
   }
 }
 
-// Carousel Methods
-// const nextSlide = () => {
-//   if (currentSlide.value < featuredBooks.value.length - 1) {
-//     currentSlide.value++
-//   }
-// }
-
-// const prevSlide = () => {
-//   if (currentSlide.value > 0) {
-//     currentSlide.value--
-//   }
-// }
-
-// const carouselStyle = computed(() => ({
-//   transform: `translateX(-${currentSlide.value * 100}%)`
-// }))
-
 const updateExchangeRates = async () => {
   try {
     const rates = await currencyService.getRates('USD')
     exchangeRates.value = rates
-    console.log("Exchange rates updated:", rates)
+    console.log('Exchange rates updated:', rates)
   } catch (err) {
-    console.error("Error updating exchange rates:", err)
+    console.error('Error updating exchange rates:', err)
   }
 }
 
 onMounted(async () => {
-  // İlk önce kitapları yükle
-  await store.dispatch('books/searchBooks')
-  // Döviz kurlarını getir
-  updateExchangeRates()
-  // 30 dakikada bir kur güncellemesi yap (30 * 60 * 1000 = 1,800,000ms)
-  setInterval(() => {
-    updateExchangeRates()
-  }, 1800000)
+  await Promise.all([store.dispatch('books/searchBooks'), updateExchangeRates()])
+
+  // 30 dakikada bir kur güncellemesi için zaman ekliyorum.
+  setInterval(updateExchangeRates, 1800000)
 })
-
+watch(currency, async (newCurrency) => {
+  if (!exchangeRates.value) {
+    await updateExchangeRates()
+  }
+})
 </script>
-
-
-
-
 
 <style scoped>
 .home {
@@ -493,9 +425,8 @@ onMounted(async () => {
 
 .filter-controls {
   display: flex;
-  gap: 1rem;
   align-items: center;
-  justify-content:space-between ;
+  justify-content: space-between;
   gap: 5rem;
   flex-wrap: wrap;
 }
@@ -519,7 +450,8 @@ onMounted(async () => {
   outline: none;
 }
 
-.sort-select, .currency-select {
+.sort-select,
+.currency-select {
   padding: 0.75rem;
   border: 2px solid #eee;
   border-radius: 8px;
@@ -552,8 +484,14 @@ onMounted(async () => {
   animation: fadeIn 0.5s ease-in-out;
 }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .filter-grid {
@@ -570,7 +508,9 @@ onMounted(async () => {
   border-radius: 8px;
   border: 1px solid #eee;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .filter-group:hover {
@@ -597,7 +537,7 @@ onMounted(async () => {
 }
 
 .filter-group select,
-.filter-group input[type="number"] {
+.filter-group input[type='number'] {
   font-size: 0.95rem;
   padding: 0.5rem;
   margin-top: 0.4rem;
@@ -608,12 +548,9 @@ onMounted(async () => {
 }
 
 .filter-group select:focus,
-.filter-group input[type="number"]:focus {
+.filter-group input[type='number']:focus {
   border-color: #42b883;
 }
-
-
-
 
 .view-controls {
   display: flex;
@@ -632,7 +569,6 @@ onMounted(async () => {
   align-items: center;
   gap: 0.5rem;
 }
-
 
 .view-btn.active {
   background: #42b883;
@@ -660,7 +596,7 @@ onMounted(async () => {
   background: white;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
@@ -668,7 +604,7 @@ onMounted(async () => {
 
 .book-item:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
 .book-image {
@@ -696,7 +632,7 @@ onMounted(async () => {
   border-radius: 50%;
   background: white;
   border: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   color: #999;
   font-size: 1.2rem;
   cursor: pointer;
@@ -713,7 +649,6 @@ onMounted(async () => {
 
 .favorite-btn.active {
   color: #ff4757;
-  
 }
 
 .book-info {
@@ -761,7 +696,7 @@ onMounted(async () => {
   gap: 1rem;
   color: #666;
   font-size: 0.85rem;
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
 }
 .book-meta .year,
 .book-meta .language {
@@ -776,18 +711,11 @@ onMounted(async () => {
   border: 1px solid #eee;
 }
 .book-meta .year::before {
-  content: "📅";
+  content: '📅';
 }
 
 .book-meta .language::before {
-  content: "🌐";
-}
-
-.book-meta .year:hover,
-.book-meta .language:hover {
-  background: #42b883;
-  color: white;
-  border-color: #42b883;
+  content: '🌐';
 }
 
 .details-btn {
@@ -803,6 +731,89 @@ onMounted(async () => {
 
 .details-btn:hover {
   background: #3aa876;
+}
+/* ...existing styles... */
+
+/* Table View Styles */
+.table-container {
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.books-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+.books-table th {
+  background: #42b883;
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 500;
+}
+
+.books-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.book-image-cell {
+  width: 80px;
+}
+.book-image-cell img {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.book-title-cell {
+  max-width: 300px;
+}
+
+.actions-cell {
+  white-space: nowrap;
+  width: 150px;
+}
+
+.favorite-btn-table,
+.details-btn-table {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.favorite-btn-table {
+  background: white;
+  border: 1px solid #ddd;
+  color: #999;
+  margin-right: 0.5rem;
+}
+.favorite-btn-table.active {
+  color: #ff4757;
+  border-color: #ff4757;
+}
+
+.details-btn-table {
+  background: #42b883;
+  color: white;
+  border: none;
+}
+
+.details-btn-table:hover {
+  background: #3aa876;
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
 }
 
 /* Responsive kısmı */
@@ -832,8 +843,22 @@ onMounted(async () => {
     flex-direction: column;
   }
 
-  .sort-select, .currency-select {
+  .sort-select,
+  .currency-select {
     width: 100%;
+  }
+  .table-container {
+    margin: 0 -1rem;
+  }
+
+  .books-table th,
+  .books-table td {
+    padding: 0.75rem;
+  }
+
+  .book-image-cell img {
+    width: 40px;
+    height: 60px;
   }
 }
 </style>
