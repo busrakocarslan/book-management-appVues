@@ -117,7 +117,7 @@
 
             <!-- Döviz Çevrimleri -->
             <div class="currency-conversions" v-if="bookData.price && exchangeRates">
-              <p v-for="(rate, curr) in exchangeRates" :key="curr">
+              <p v-for="(rate, curr) in filteredRates" :key="curr">
                 {{ formatPrice(convertPrice(bookData.price, curr), curr) }}
               </p>
             </div>
@@ -383,10 +383,13 @@ const resetForm = () => {
 
 onMounted(async () => {
   try {
-    const rates = await store.dispatch('currency/fetchRates')
-    exchangeRates.value = rates
+    const { currencyService } = await import('@/services/currencyService')
+    const rates = await currencyService.getRates('USD')
+    exchangeRates.value = rates  
+    
   } catch (error) {
     console.error('Error fetching exchange rates:', error)
+    
   }
 })
 </script>
